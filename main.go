@@ -1,4 +1,4 @@
-package testCodeK8
+package main
 
 import (
 	"encoding/json"
@@ -15,7 +15,7 @@ import (
 func main(){
 
 	fmt.Println("savvy K8s running")
-	K8sProxy()
+	//K8sProxy()
 
 	//Add loop to run after specific time
 
