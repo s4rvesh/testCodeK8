@@ -1,7 +1,6 @@
 package testCodeK8
 
 import (
-	"SavvyK8s/k8api/mailAlert"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -156,10 +155,10 @@ func CheckThresholdNode(NodeResponseObject NodeMetrics){
 
 	for i:=0;i<len(NodeResponseObject.Nodes);i++{
 		if NodeResponseObject.Nodes[i].NodeUsages.CpuInt > 10000{
-			mailAlert.MailAlert("Node",NodeResponseObject.Nodes[i].MetadataNodes.Name,"cpu",NodeResponseObject.Nodes[i].NodeUsages.CpuInt )
+			MailAlert("Node",NodeResponseObject.Nodes[i].MetadataNodes.Name,"cpu",NodeResponseObject.Nodes[i].NodeUsages.CpuInt )
 
 		} else if NodeResponseObject.Nodes[i].NodeUsages.MemoryInt > 10000{
-			mailAlert.MailAlert("Node",NodeResponseObject.Nodes[i].MetadataNodes.Name,"memory",NodeResponseObject.Nodes[i].NodeUsages.MemoryInt)
+			MailAlert("Node",NodeResponseObject.Nodes[i].MetadataNodes.Name,"memory",NodeResponseObject.Nodes[i].NodeUsages.MemoryInt)
 
 		}
 	}
@@ -178,11 +177,11 @@ func CheckThresholdPod(PodResponseObject PodMetrics){
 
 				if PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt > 1000{
 
-					mailAlert.MailAlert("Pod",PodResponseObject.Pods[i].MetadataPods.Name,"cpu",PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt )
+					MailAlert("Pod",PodResponseObject.Pods[i].MetadataPods.Name,"cpu",PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt )
 
 				} else if PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt > 1000 {
 
-					mailAlert.MailAlert("Pod",PodResponseObject.Pods[i].MetadataPods.Name,"cpu",PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt )
+					MailAlert("Pod",PodResponseObject.Pods[i].MetadataPods.Name,"cpu",PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt )
 
 				}
 
