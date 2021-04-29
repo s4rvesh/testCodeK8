@@ -279,10 +279,10 @@ type smtpServer struct {
 
 type NodeMetrics struct{
 
-	Kind string `json:":"kind"`
-	ApiVersion string `json:":"apiVersion"`
-	Metadata string `json:":"metadata"`
-	Nodes []Node `json:":"items"`
+	Kind string `json:"kind"`
+	ApiVersion string `json: "apiVersion"`
+	Metadata string `json:"metadata"`
+	Nodes []Node `json:"items"`
 }
 
 type Node struct {
@@ -307,11 +307,11 @@ type  MetadataNode struct {
 
 type PodMetrics struct{
 
-	Kind string `json:":"kind"`
-	ApiVersion string `json:":"apiVersion"`
-	Metadata string `json:":"metadata"`
-	SelfLink string `json:":"selfLink"`
-	Pods []Pod `json:":"items"`
+	Kind string `json:"kind"`
+	ApiVersion string `json:"apiVersion"`
+	Metadata string `json:"metadata"`
+	SelfLink string `json:"selfLink"`
+	Pods []Pod `json:"items"`
 }
 
 
@@ -332,10 +332,10 @@ type Container struct{
 
 
 type MetadataPod struct {
-	Name string `json:":"name"`
-	Namespace string `json:":"namespace"`
-	SelfLink string `json:":"selfLink"`
-	CreationTimestamp string `json:":"creationTimestamp"`
+	Name string `json:"name"`
+	Namespace string `json:"namespace"`
+	SelfLink string `json:"selfLink"`
+	CreationTimestamp string `json:"creationTimestamp"`
 }
 
 
