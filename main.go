@@ -59,7 +59,7 @@ func K8sProxy(){
 
 func GetPods() PodMetrics{
 
-	url := "localhost:8080/apis/metrics.k8s.io/v1beta1/pods"
+	url := "127.0.0.1:8080/apis/metrics.k8s.io/v1beta1/pods"
 	responseData := Getdata(url)
 
 
