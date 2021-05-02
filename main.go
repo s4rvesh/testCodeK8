@@ -28,10 +28,12 @@ func main(){
 	PodResponseObject, NodeResponseObject = GetIntVals(PodResponseObject,NodeResponseObject)
 
 	fmt.Println("-------------------------------------------------")
-	fmt.Println(PodResponseObject)
+	fmt.Println(PodResponseObject.Pods[0].Containers[0].ContainerUsages[0].MemoryInt)
+	fmt.Println(PodResponseObject.Pods[0].Containers[0].ContainerUsages[0].CpuInt)
 	fmt.Println("")
 	fmt.Println("")
-	fmt.Println(NodeResponseObject)
+	fmt.Println(NodeResponseObject.Nodes[0].NodeUsages.CpuInt)
+	fmt.Println(NodeResponseObject.Nodes[0].NodeUsages.MemoryInt)
 	fmt.Println("-------------------------------------------------")
 
 	CheckThresholdPod(PodResponseObject)
