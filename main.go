@@ -67,7 +67,6 @@ func GetPods() PodMetrics{
 	var PodResponseObject PodMetrics
 	json.Unmarshal(responseData, &PodResponseObject)
 
-	fmt.Println(PodResponseObject)
 
 	return PodResponseObject
 }
