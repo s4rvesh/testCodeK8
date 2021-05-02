@@ -153,10 +153,10 @@ func convertInt(cpuMetrics string, memoryMetrics string) (int64,int64){
 func CheckThresholdNode(NodeResponseObject NodeMetrics){
 
 	for i:=0;i<len(NodeResponseObject.Nodes);i++{
-		if NodeResponseObject.Nodes[i].NodeUsages.CpuInt > 10000{
+		if NodeResponseObject.Nodes[i].NodeUsages.CpuInt > 100000000{
 			MailAlert("Node",NodeResponseObject.Nodes[i].MetadataNodes.Name,"cpu",NodeResponseObject.Nodes[i].NodeUsages.CpuInt )
 
-		} else if NodeResponseObject.Nodes[i].NodeUsages.MemoryInt > 10000{
+		} else if NodeResponseObject.Nodes[i].NodeUsages.MemoryInt > 100000000{
 			MailAlert("Node",NodeResponseObject.Nodes[i].MetadataNodes.Name,"memory",NodeResponseObject.Nodes[i].NodeUsages.MemoryInt)
 
 		}
@@ -174,11 +174,11 @@ func CheckThresholdPod(PodResponseObject PodMetrics){
 
 			for k:=0;k<len(PodResponseObject.Pods[i].Containers[j].ContainerUsages);k++{
 
-				if PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt > 1000{
+				if PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt > 1000000000{
 
 					MailAlert("Pod",PodResponseObject.Pods[i].MetadataPods.Name,"cpu",PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt )
 
-				} else if PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt > 1000 {
+				} else if PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt > 1000000000 {
 
 					MailAlert("Pod",PodResponseObject.Pods[i].MetadataPods.Name,"cpu",PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt )
 
@@ -203,15 +203,15 @@ func (s *smtpServer) Address() string {
 
 func MailAlert(item string,item_name string, metric_type string, metric_val int64){
 
-	from := "sarvesh.upadhye@gmail.com"
-	password := "S4rvesh@7781"
+	from := "cmpe272team18@gmail.com"
+	password := "Kubernetes@cmpe"
 
 
 
 	// Receiver email address to be set
 
 	to := []string{
-		"hashercool@gmail.com",
+		"sarvesh.upadhye@gmail.com",
 	}
 
 	smtpServer := smtpServer{host: "smtp.gmail.com", port: "587"}
