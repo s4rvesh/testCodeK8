@@ -144,10 +144,10 @@ func convertInt(cpuMetrics string, memoryMetrics string) (int64,int64){
 func CheckThresholdNode(NodeResponseObject NodeMetrics){
 
 	for i:=0;i<len(NodeResponseObject.Nodes);i++{
-		if NodeResponseObject.Nodes[i].NodeUsages.CpuInt > 100000000{
+		if NodeResponseObject.Nodes[i].NodeUsages.CpuInt > 1{
 			MailAlert("Node",NodeResponseObject.Nodes[i].MetadataNodes.Name,"cpu",NodeResponseObject.Nodes[i].NodeUsages.CpuInt )
 
-		} else if NodeResponseObject.Nodes[i].NodeUsages.MemoryInt > 100000000{
+		} else if NodeResponseObject.Nodes[i].NodeUsages.MemoryInt > 1{
 			MailAlert("Node",NodeResponseObject.Nodes[i].MetadataNodes.Name,"memory",NodeResponseObject.Nodes[i].NodeUsages.MemoryInt)
 
 		}
