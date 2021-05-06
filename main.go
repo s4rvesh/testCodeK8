@@ -1,23 +1,24 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/smtp"
 	"os"
-	"os/exec"
 	"strconv"
+	"time"
 )
 
 func main(){
 
 	fmt.Println("savvy K8s running")
-	//K8sProxy()
-
-	//Add loop to run after specific time
 
 	var PodResponseObject PodMetrics
 	var NodeResponseObject NodeMetrics
@@ -46,18 +47,7 @@ func main(){
 
 
 ////////////////////////////////////////////////////////
-func K8sProxy(){
 
-	out, err := exec.Command("kubectl", "proxy", "--port=8080").Output()
-	if err != nil {
-		fmt.Printf("%s", err)
-	}
-	fmt.Println("Command Successfully Executed")
-	output := string(out[:])
-	fmt.Println(output)
-
-}
-////////////////////////////////////////////////////////////
 
 func GetPods() PodMetrics{
 
@@ -262,6 +252,56 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 
 
 }
+////////////////////////////////////////////////////////////////////////
+
+func MongoConnect(uri string) (*mongo.Client, context.Context){
+
+	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
+	if err != nil {
+		log.Fatal(err)
+	}
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	err = client.Connect(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return client,ctx
+}
+
+
+
+func MongoInsert(Client *mongo.Client,ctx context.Context,PodResponseObject PodMetrics, NodeResponseObject NodeMetrics) bool{
+
+
+
+
+	return true
+}
+
+func MongoStore(PodResponseObject PodMetrics,NodeResponseObject NodeMetrics){
+	uri:="mongodb+srv://admin:admin123@cluster0.lnxpp.mongodb.net/kubernetes-metrics?retryWrites=true&w=majority"
+	client, ctx := MongoConnect(uri)
+
+
+
+	//testing code. remove after testing
+	databases, err := client.ListDatabaseNames(ctx, bson.M{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(databases)
+
+	MongoInsert(client,ctx, PodResponseObject,NodeResponseObject)
+	//Add code to insert data to mongodb database
+	//Add for nodes and for pods/containers
+
+	defer client.Disconnect(ctx)
+
+}
+
+
+
 
 
 
