@@ -217,12 +217,15 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 			m3:=" is above threshold. Memory Usage:"
 			m4:=metric_val
 			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10))
+			fmt.Println(message)
 		} else {
 			m1:="The CPU usage of Node:"
 			m2:=item_name
 			m3:=" is above threshold. CPU Usage:"
 			m4:=metric_val
 			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10))
+			fmt.Println(message)
+
 		}
 
 
@@ -233,12 +236,16 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 			m3:=" is above threshold. Memory Usage:"
 			m4:=metric_val
 			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10))
+			fmt.Println(message)
+
 		} else {
 			m1:="The CPU usage of Pod:"
 			m2:=item_name
 			m3:=" is above threshold. CPU Usage:"
 			m4:=metric_val
 			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10))
+			fmt.Println(message)
+
 		}
 	}
 
