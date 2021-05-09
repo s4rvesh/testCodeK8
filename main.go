@@ -23,25 +23,20 @@ func main(){
 	var PodResponseObject PodMetrics
 	var NodeResponseObject NodeMetrics
 
+	for i:=0;i<20;i++{
 
-	PodResponseObject = GetPods()
-	NodeResponseObject = GetNodes()
-	PodResponseObject, NodeResponseObject = GetIntVals(PodResponseObject,NodeResponseObject)
-	//
-	//fmt.Println("-------------------------------------------------")
-	//fmt.Println(PodResponseObject.Pods[0].Containers[0].ContainerUsages[0].MemoryInt)
-	//fmt.Println(PodResponseObject.Pods[0].Containers[0].ContainerUsages[0].CpuInt)
-	//fmt.Println("")
-	//fmt.Println("")
-	//fmt.Println(NodeResponseObject.Nodes[0].NodeUsages.CpuInt)
-	//fmt.Println(NodeResponseObject.Nodes[0].NodeUsages.MemoryInt)
-	//fmt.Println("-------------------------------------------------")
+		PodResponseObject = GetPods()
+		NodeResponseObject = GetNodes()
+		PodResponseObject, NodeResponseObject = GetIntVals(PodResponseObject,NodeResponseObject)
 
-	//CheckThresholdPod(PodResponseObject)
-	//CheckThresholdNode(NodeResponseObject)
+		//CheckThresholdPod(PodResponseObject)
+		//CheckThresholdNode(NodeResponseObject)
+		MongoStore(PodResponseObject, NodeResponseObject)
 
+		time.Sleep(10 * time.Second)
 
-	MongoStore(PodResponseObject, NodeResponseObject)
+	}
+
 }
 
 
@@ -136,7 +131,7 @@ func convertInt(cpuMetrics string, memoryMetrics string) (int64,int64){
 	cpuMetricsInt, _ := strconv.ParseInt(cpuMetrics,10,64)
 	memoryMetricsInt,_ := strconv.ParseInt(memoryMetrics,10,64)
 
-	return cpuMetricsInt,memoryMetricsInt
+	return cpuMetricsInt/1024,memoryMetricsInt/1024
 
 }
 ////////////////////////////////////////////////////////////
