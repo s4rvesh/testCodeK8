@@ -289,10 +289,10 @@ func MongoInsert(client *mongo.Client,ctx context.Context,PodResponseObject PodM
 
 	// Declare a MongoDB struct instance for the document's fields and data
 	oneDoc := NodeMongo{
-		//metrics: NodeMetricsMongo{
-		//	cpu: NodeResponseObject.Nodes[0].NodeUsages.CpuInt,
-		//	memory: NodeResponseObject.Nodes[0].NodeUsages.MemoryInt,
-		//},
+		metrics: NodeMetricsMongo{
+			cpu: NodeResponseObject.Nodes[0].NodeUsages.CpuInt,
+			memory: NodeResponseObject.Nodes[0].NodeUsages.MemoryInt,
+		},
 		nodeMetrics: true,
 		nodeId: 1,
 		createdBy: "System",
@@ -355,15 +355,15 @@ type smtpServer struct {
 
 
 type NodeMongo struct {
-	metrics NodeMetricsMongo `json:"metrics"`
-	nodeMetrics bool `json:"nodeMetrics"`
-	nodeId int `json:"nodeId"`
-	createdBy string `json:"createdBy"`
+	metrics NodeMetricsMongo
+	nodeMetrics bool
+	nodeId int
+	createdBy string
 }
 
 type  NodeMetricsMongo struct {
-	cpu int64 `json:"cpu"`
-	memory int64 `json:"memory"`
+	cpu int64
+	memory int64 
 }
 
 
