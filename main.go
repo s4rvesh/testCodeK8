@@ -37,11 +37,11 @@ func main(){
 	//fmt.Println(NodeResponseObject.Nodes[0].NodeUsages.MemoryInt)
 	//fmt.Println("-------------------------------------------------")
 
-	CheckThresholdPod(PodResponseObject)
-	CheckThresholdNode(NodeResponseObject)
+	//CheckThresholdPod(PodResponseObject)
+	//CheckThresholdNode(NodeResponseObject)
 
 
-	//mongostore.MongoStore(PodResponseObject, NodeResponseObject)
+	MongoStore(PodResponseObject, NodeResponseObject)
 }
 
 
@@ -224,6 +224,7 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 			m3:=" is above threshold. CPU Usage:"
 			m4:=metric_val
 			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10))
+
 			fmt.Println(message)
 
 		}
@@ -236,6 +237,7 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 			m3:=" is above threshold. Memory Usage:"
 			m4:=metric_val
 			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10))
+
 			fmt.Println(message)
 
 		} else {
@@ -244,6 +246,7 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 			m3:=" is above threshold. CPU Usage:"
 			m4:=metric_val
 			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10))
+
 			fmt.Println(message)
 
 		}
@@ -278,8 +281,31 @@ func MongoConnect(uri string) (*mongo.Client, context.Context){
 
 
 
-func MongoInsert(Client *mongo.Client,ctx context.Context,PodResponseObject PodMetrics, NodeResponseObject NodeMetrics) bool{
+func MongoInsert(client *mongo.Client,ctx context.Context,PodResponseObject PodMetrics, NodeResponseObject NodeMetrics) bool{
 
+
+
+	col := client.Database("some_database").Collection("Some Collection")
+
+	// Declare a MongoDB struct instance for the document's fields and data
+	oneDoc := NodeMongo{
+		appId: 1,
+		podId: 1,
+		metrics: NodeMetricsMongo{
+			cpu: NodeResponseObject.Nodes[0].NodeUsages.CpuInt,
+			memory: NodeResponseObject.Nodes[0].NodeUsages.MemoryInt,
+		},
+		nodeMetrics: true,
+		createdBy: "System",
+	}
+
+	_, insertErr := col.InsertOne(ctx,oneDoc)
+	if insertErr != nil {
+		fmt.Println("InsertOne ERROR:", insertErr)
+		os.Exit(1) // safely exit script on error
+	} else {
+		fmt.Println("Added data to mongo")
+	}
 
 
 
@@ -322,6 +348,25 @@ type smtpServer struct {
 	host string
 	port string
 }
+
+
+
+
+
+type NodeMongo struct {
+	appId int `json:"appId int"`
+	podId int `json:"podId Int"`
+	metrics NodeMetricsMongo `json:"metrics Bool"`
+	nodeMetrics bool `json:"nodeMetrics Bool"`
+	createdBy string `json:"createdBy int"`
+}
+
+type  NodeMetricsMongo struct {
+	cpu int64 `json:"cpu int"`
+	memory int64 `json:"memory int"`
+}
+
+
 
 
 type NodeMetrics struct{
