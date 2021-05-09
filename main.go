@@ -355,15 +355,15 @@ type smtpServer struct {
 
 
 type NodeMongo struct {
-	metrics NodeMetricsMongo `json:"metrics object"`
-	nodeMetrics bool `json:"nodeMetrics Bool"`
-	nodeId int `json:"nodeId int"`
-	createdBy string `json:"createdBy int"`
+	metrics NodeMetricsMongo `json:"metrics"`
+	nodeMetrics bool `json:"nodeMetrics"`
+	nodeId int `json:"nodeId"`
+	createdBy string `json:"createdBy"`
 }
 
 type  NodeMetricsMongo struct {
-	cpu int64 `json:"cpu int"`
-	memory int64 `json:"memory int"`
+	cpu int64 `json:"cpu"`
+	memory int64 `json:"memory"`
 }
 
 
