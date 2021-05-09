@@ -301,7 +301,15 @@ func MongoInsert(client *mongo.Client,ctx context.Context,PodResponseObject PodM
 	//fmt.Println(oneDoc)
 
 	_, insertErr := col.InsertOne(ctx,bson.D{
+
+
+		{Key: "metrics", Value:bson.D{{Key: "cpu", Value: NodeResponseObject.Nodes[0].NodeUsages.CpuInt},{Key: "memory", Value: NodeResponseObject.Nodes[0].NodeUsages.MemoryInt}}},
+		{Key: "nodeMetrics", Value: true},
 		{Key: "nodeId", Value: 1},
+		{Key: "createdBy", Value: "System"},
+
+
+
 	})
 	if insertErr != nil {
 		fmt.Println("InsertOne ERROR:", insertErr)
