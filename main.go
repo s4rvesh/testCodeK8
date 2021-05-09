@@ -281,7 +281,7 @@ func MongoInsert(client *mongo.Client,ctx context.Context,PodResponseObject PodM
 
 
 
-	col := client.Database("kubernetes-metrics").Collection("custAppMetrics1")
+	col := client.Database("kubernetes-metrics").Collection("custAppMetrics2")
 
 	// Declare a MongoDB struct instance for the document's fields and data
 	//oneDoc := NodeMongo{
@@ -312,7 +312,7 @@ func MongoInsert(client *mongo.Client,ctx context.Context,PodResponseObject PodM
 	} else {
 		fmt.Println("Added data to mongo")
 	}
-	
+
 	return true
 }
 
