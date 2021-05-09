@@ -288,19 +288,21 @@ func MongoInsert(client *mongo.Client,ctx context.Context,PodResponseObject PodM
 	col := client.Database("kubernetes-metrics").Collection("custAppMetrics1")
 
 	// Declare a MongoDB struct instance for the document's fields and data
-	oneDoc := NodeMongo{
-		metrics: NodeMetricsMongo{
-			cpu: NodeResponseObject.Nodes[0].NodeUsages.CpuInt,
-			memory: NodeResponseObject.Nodes[0].NodeUsages.MemoryInt,
-		},
-		nodeMetrics: true,
-		nodeId: 1,
-		createdBy: "System",
-	}
+	//oneDoc := NodeMongo{
+	//	metrics: NodeMetricsMongo{
+	//		cpu: NodeResponseObject.Nodes[0].NodeUsages.CpuInt,
+	//		memory: NodeResponseObject.Nodes[0].NodeUsages.MemoryInt,
+	//	},
+	//	nodeMetrics: true,
+	//	nodeId: 1,
+	//	createdBy: "System",
+	//}
 
-	fmt.Println(oneDoc)
+	//fmt.Println(oneDoc)
 
-	_, insertErr := col.InsertOne(ctx,oneDoc)
+	_, insertErr := col.InsertOne(ctx,bson.D{
+		{Key: "nodeId", Value: 1},
+	})
 	if insertErr != nil {
 		fmt.Println("InsertOne ERROR:", insertErr)
 		os.Exit(1) // safely exit script on error
@@ -363,7 +365,7 @@ type NodeMongo struct {
 
 type  NodeMetricsMongo struct {
 	cpu int64
-	memory int64 
+	memory int64
 }
 
 
