@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"io/ioutil"
@@ -294,7 +295,7 @@ func MongoInsert(client *mongo.Client,ctx context.Context,PodResponseObject PodM
 	//}
 
 	//fmt.Println(oneDoc)
-
+	currentTime := time.Now()
 	_, insertErr := col.InsertOne(ctx,bson.D{
 
 
@@ -302,8 +303,7 @@ func MongoInsert(client *mongo.Client,ctx context.Context,PodResponseObject PodM
 		{Key: "nodeMetrics", Value: true},
 		{Key: "nodeId", Value: 1},
 		{Key: "createdBy", Value: "System"},
-
-
+		{Key: "createdDate", Value: currentTime.String()},
 
 	})
 	if insertErr != nil {
@@ -312,9 +312,7 @@ func MongoInsert(client *mongo.Client,ctx context.Context,PodResponseObject PodM
 	} else {
 		fmt.Println("Added data to mongo")
 	}
-
-
-
+	
 	return true
 }
 
@@ -364,6 +362,7 @@ type NodeMongo struct {
 	nodeMetrics bool
 	nodeId int
 	createdBy string
+	createdDate primitive.DateTime
 }
 
 type  NodeMetricsMongo struct {
