@@ -87,6 +87,7 @@ func Getdata(url string) []byte{
 
 
 func GetIntVals(PodResponseObject PodMetrics,NodeResponseObject NodeMetrics)(PodMetrics, NodeMetrics){
+	fmt.Println("In get Int func")
 	var TotalPodCpu int64
 	var TotalPodMem int64
 	for  i:=0;i<len(PodResponseObject.Pods);i++{
