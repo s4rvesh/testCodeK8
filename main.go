@@ -88,27 +88,38 @@ func Getdata(url string) []byte{
 
 func GetIntVals(PodResponseObject PodMetrics,NodeResponseObject NodeMetrics)(PodMetrics, NodeMetrics){
 	fmt.Println("In get Int func")
-	var TotalPodCpu int64
-	var TotalPodMem int64
-	for  i:=0;i<len(PodResponseObject.Pods);i++{
+	//var TotalPodCpu int64
+	//var TotalPodMem int64
+
+
+	for i:=0;i<len(PodResponseObject.Pods);i++{
 		for j:=0;j<len(PodResponseObject.Pods[i].Containers);j++{
-
-			for k:=0;k<len(PodResponseObject.Pods[i].Containers[j].ContainerUsages);j++{
-				PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt,PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt = convertInt(PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].Cpu, PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].Memory)
-
-				TotalPodCpu = TotalPodCpu + PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt
-				TotalPodMem = TotalPodMem + PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt
-				fmt.Println("TotalPodCPU",TotalPodCpu)
-				fmt.Println("TotalPodMem",TotalPodMem)
-
-			}
-			PodResponseObject.Pods[j].Cpu=TotalPodCpu
-			PodResponseObject.Pods[j].Memory=TotalPodMem
-
-
+			fmt.Println("Pod:",i," container:",j)
+			fmt.Println(PodResponseObject.Pods[i].Containers[j].Name)
+			fmt.Println("")
 		}
-
 	}
+
+	//
+	//for  i:=0;i<len(PodResponseObject.Pods);i++{
+	//	for j:=0;j<len(PodResponseObject.Pods[i].Containers);j++{
+	//
+	//		for k:=0;k<len(PodResponseObject.Pods[i].Containers[j].ContainerUsages);j++{
+	//			PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt,PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt = convertInt(PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].Cpu, PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].Memory)
+	//
+	//			TotalPodCpu = TotalPodCpu + PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt
+	//			TotalPodMem = TotalPodMem + PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt
+	//			fmt.Println("TotalPodCPU",TotalPodCpu)
+	//			fmt.Println("TotalPodMem",TotalPodMem)
+	//
+	//		}
+	//		PodResponseObject.Pods[j].Cpu=TotalPodCpu
+	//		PodResponseObject.Pods[j].Memory=TotalPodMem
+	//
+	//
+	//	}
+	//
+	//}
 
 
 	for i:=0;i<len(NodeResponseObject.Nodes);i++{
