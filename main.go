@@ -23,14 +23,14 @@ func main(){
 	var PodResponseObject PodMetrics
 	var NodeResponseObject NodeMetrics
 
-	for i:=0;i<20;i++{
+	for i:=0;i<5;i++{
 
 		PodResponseObject = GetPods()
 		NodeResponseObject = GetNodes()
 		PodResponseObject, NodeResponseObject = GetIntVals(PodResponseObject,NodeResponseObject)
 		CheckThresholdPod(PodResponseObject)
 		CheckThresholdNode(NodeResponseObject)
-		MongoStore(PodResponseObject, NodeResponseObject)
+		//MongoStore(PodResponseObject, NodeResponseObject)
 
 		time.Sleep(10 * time.Second)
 
