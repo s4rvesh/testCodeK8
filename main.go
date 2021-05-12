@@ -88,38 +88,22 @@ func Getdata(url string) []byte{
 
 func GetIntVals(PodResponseObject PodMetrics,NodeResponseObject NodeMetrics)(PodMetrics, NodeMetrics){
 	fmt.Println("In get Int func")
-	//var TotalPodCpu int64
-	//var TotalPodMem int64
+	var TotalPodCpu int64
+	var TotalPodMem int64
 
 
 	for i:=0;i<len(PodResponseObject.Pods);i++{
+		TotalPodMem = 0
+		TotalPodCpu = 0
 		for j:=0;j<len(PodResponseObject.Pods[i].Containers);j++{
-			fmt.Println("Pod:",i," container:",j)
-			fmt.Println(PodResponseObject.Pods[i].Containers[j].Name)
-			fmt.Println("")
+
+			PodResponseObject.Pods[i].Containers[j].ContainerUsages.CpuInt, PodResponseObject.Pods[i].Containers[j].ContainerUsages.MemoryInt = convertInt(PodResponseObject.Pods[i].Containers[j].ContainerUsages.Cpu, PodResponseObject.Pods[i].Containers[j].ContainerUsages.Memory)
+			TotalPodCpu = TotalPodCpu + PodResponseObject.Pods[i].Containers[j].ContainerUsages.CpuInt
+			TotalPodMem = TotalPodMem + PodResponseObject.Pods[i].Containers[j].ContainerUsages.MemoryInt
+
 		}
 	}
-
-	//
-	//for  i:=0;i<len(PodResponseObject.Pods);i++{
-	//	for j:=0;j<len(PodResponseObject.Pods[i].Containers);j++{
-	//
-	//		for k:=0;k<len(PodResponseObject.Pods[i].Containers[j].ContainerUsages);j++{
-	//			PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt,PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt = convertInt(PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].Cpu, PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].Memory)
-	//
-	//			TotalPodCpu = TotalPodCpu + PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt
-	//			TotalPodMem = TotalPodMem + PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt
-	//			fmt.Println("TotalPodCPU",TotalPodCpu)
-	//			fmt.Println("TotalPodMem",TotalPodMem)
-	//
-	//		}
-	//		PodResponseObject.Pods[j].Cpu=TotalPodCpu
-	//		PodResponseObject.Pods[j].Memory=TotalPodMem
-	//
-	//
-	//	}
-	//
-	//}
+	
 
 
 	for i:=0;i<len(NodeResponseObject.Nodes);i++{
@@ -515,7 +499,7 @@ type Pod struct {
 
 type Container struct{
 	Name string `json:"name"`
-	ContainerUsages []ContainerUsage `json:"usage"`
+	ContainerUsages ContainerUsage `json:"usage"`
 }
 
 
