@@ -362,7 +362,7 @@ func MongoInsert(client *mongo.Client,ctx context.Context,PodResponseObject PodM
 				{Key: "metrics", Value:bson.D{{Key: "cpu", Value: PodResponseObject.Pods[i].Cpu},{Key: "memory", Value: PodResponseObject.Pods[i].Memory }}},
 				{Key: "appId", Value: 1},
 				{Key: "podId", Value: 1},
-				{Key: "nodeMetrics", Value:"false"},
+				{Key: "nodeMetrics", Value:false},
 				{Key: "createdBy", Value: "System"},
 				{Key: "createdDate", Value: currentTime.String()},
 
@@ -381,7 +381,7 @@ func MongoInsert(client *mongo.Client,ctx context.Context,PodResponseObject PodM
 				{Key: "metrics", Value:bson.D{{Key: "cpu", Value: PodResponseObject.Pods[i].Cpu},{Key: "memory", Value: PodResponseObject.Pods[i].Memory }}},
 				{Key: "appId", Value: 2},
 				{Key: "podId", Value: 2},
-				{Key: "nodeMetrics", Value:"false"},
+				{Key: "nodeMetrics", Value:false},
 				{Key: "createdBy", Value: "System"},
 				{Key: "createdDate", Value: currentTime.String()},
 
