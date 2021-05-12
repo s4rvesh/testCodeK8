@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"io/ioutil"
@@ -29,9 +28,8 @@ func main(){
 		PodResponseObject = GetPods()
 		NodeResponseObject = GetNodes()
 		PodResponseObject, NodeResponseObject = GetIntVals(PodResponseObject,NodeResponseObject)
-
-		//CheckThresholdPod(PodResponseObject)
-		//CheckThresholdNode(NodeResponseObject)
+		CheckThresholdPod(PodResponseObject)
+		CheckThresholdNode(NodeResponseObject)
 		MongoStore(PodResponseObject, NodeResponseObject)
 
 		time.Sleep(10 * time.Second)
@@ -47,7 +45,7 @@ func main(){
 
 func GetPods() PodMetrics{
 
-	url := "http://127.0.0.1:8080/apis/metrics.k8s.io/v1beta1/pods"
+	url := "http://127.0.0.1:8080/apis/metrics.k8s.io/v1beta1/namespaces/default/pods"
 	responseData := Getdata(url)
 
 	var PodResponseObject PodMetrics
@@ -91,12 +89,18 @@ func Getdata(url string) []byte{
 func GetIntVals(PodResponseObject PodMetrics,NodeResponseObject NodeMetrics)(PodMetrics, NodeMetrics){
 
 	for  i:=0;i<len(PodResponseObject.Pods);i++{
-		j:=0
-		for ;j<len(PodResponseObject.Pods[i].Containers);j++{
-			k:=0
-			for ;k<len(PodResponseObject.Pods[i].Containers[j].ContainerUsages);j++{
+		for j:=0;j<len(PodResponseObject.Pods[i].Containers);j++{
+			var TotalPodCpu int64
+			var TotalPodMem int64
+			for k:=0;k<len(PodResponseObject.Pods[i].Containers[j].ContainerUsages);j++{
 				PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt,PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt = convertInt(PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].Cpu, PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].Memory)
+
+				TotalPodCpu =TotalPodCpu + PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt
+				TotalPodMem =TotalPodMem + PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt
 			}
+			PodResponseObject.Pods[j].Cpu=TotalPodCpu
+			PodResponseObject.Pods[j].Memory=TotalPodMem
+
 		}
 
 	}
@@ -132,7 +136,7 @@ func convertInt(cpuMetrics string, memoryMetrics string) (int64,int64){
 	cpuMetricsInt, _ := strconv.ParseInt(cpuMetrics,10,64)
 	memoryMetricsInt,_ := strconv.ParseInt(memoryMetrics,10,64)
 
-	return cpuMetricsInt/1024,memoryMetricsInt/1024
+	return cpuMetricsInt/1000000,(memoryMetricsInt/1024)
 
 }
 ////////////////////////////////////////////////////////////
@@ -140,10 +144,10 @@ func convertInt(cpuMetrics string, memoryMetrics string) (int64,int64){
 func CheckThresholdNode(NodeResponseObject NodeMetrics){
 
 	for i:=0;i<len(NodeResponseObject.Nodes);i++{
-		if NodeResponseObject.Nodes[i].NodeUsages.CpuInt > 1{
+		if NodeResponseObject.Nodes[i].NodeUsages.CpuInt > 1000{
 			MailAlert("Node",NodeResponseObject.Nodes[i].MetadataNodes.Name,"cpu",NodeResponseObject.Nodes[i].NodeUsages.CpuInt )
 
-		} else if NodeResponseObject.Nodes[i].NodeUsages.MemoryInt > 1{
+		} else if NodeResponseObject.Nodes[i].NodeUsages.MemoryInt > 1000{
 			MailAlert("Node",NodeResponseObject.Nodes[i].MetadataNodes.Name,"memory",NodeResponseObject.Nodes[i].NodeUsages.MemoryInt)
 
 		}
@@ -157,25 +161,17 @@ func CheckThresholdPod(PodResponseObject PodMetrics){
 
 	for i:=0;i<len(PodResponseObject.Pods);i++{
 
-		for j:=0;j<len(PodResponseObject.Pods[i].Containers);j++{
+				if PodResponseObject.Pods[i].Cpu > 1000000000{
 
-			for k:=0;k<len(PodResponseObject.Pods[i].Containers[j].ContainerUsages);k++{
+					MailAlert("Pod",PodResponseObject.Pods[i].MetadataPods.Name,"cpu",PodResponseObject.Pods[i].Cpu)
 
-				if PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt > 1000000000{
+				} else if PodResponseObject.Pods[i].Memory> 1000000000 {
 
-					MailAlert("Pod",PodResponseObject.Pods[i].MetadataPods.Name,"cpu",PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].CpuInt )
-
-				} else if PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt > 1000000000 {
-
-					MailAlert("Pod",PodResponseObject.Pods[i].MetadataPods.Name,"cpu",PodResponseObject.Pods[i].Containers[j].ContainerUsages[k].MemoryInt )
+					MailAlert("Pod",PodResponseObject.Pods[i].MetadataPods.Name,"cpu",PodResponseObject.Pods[i].Memory)
 
 				}
-
-
-			}
-		}
-
 	}
+
 
 
 }
@@ -208,20 +204,31 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 	var message []byte
 	if item=="node"{
 		if metric_type=="memory"{
-			m1:="The memory usage of Node:"
+			m1:="The memory usage of Node: "
 			m2:=item_name
 			m3:=" is above threshold. Memory Usage:"
 			m4:=metric_val
-			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10))
-			fmt.Println(message)
+			m5:="Mi"
+			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
+
+			auth := smtp.PlainAuth("", from, password, smtpServer.host)
+			err := smtp.SendMail(smtpServer.Address(), auth, from, to, message)
+			if err != nil {
+				fmt.Println(err)
+			}
 		} else {
 			m1:="The CPU usage of Node:"
 			m2:=item_name
 			m3:=" is above threshold. CPU Usage:"
 			m4:=metric_val
-			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10))
+			m5:="mCores"
+			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
 
-			fmt.Println(message)
+			auth := smtp.PlainAuth("", from, password, smtpServer.host)
+			err := smtp.SendMail(smtpServer.Address(), auth, from, to, message)
+			if err != nil {
+				fmt.Println(err)
+			}
 
 		}
 
@@ -231,29 +238,32 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 			m1:="The memory usage of Pod:"
 			m2:=item_name
 			m3:=" is above threshold. Memory Usage:"
-			m4:=metric_val
-			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10))
+			m4:=metric_val/1024
+			m5:="Mi"
+			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
 
-			fmt.Println(message)
+			auth := smtp.PlainAuth("", from, password, smtpServer.host)
+			err := smtp.SendMail(smtpServer.Address(), auth, from, to, message)
+			if err != nil {
+				fmt.Println(err)
+			}
 
 		} else {
 			m1:="The CPU usage of Pod:"
 			m2:=item_name
 			m3:=" is above threshold. CPU Usage:"
 			m4:=metric_val
+			m5:="mCores"
+			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
 			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10))
 
-			fmt.Println(message)
+			auth := smtp.PlainAuth("", from, password, smtpServer.host)
+			err := smtp.SendMail(smtpServer.Address(), auth, from, to, message)
+			if err != nil {
+				fmt.Println(err)
+			}
 
 		}
-	}
-
-
-
-	auth := smtp.PlainAuth("", from, password, smtpServer.host)
-	err := smtp.SendMail(smtpServer.Address(), auth, from, to, message)
-	if err != nil {
-		fmt.Println(err)
 	}
 
 
@@ -280,38 +290,112 @@ func MongoConnect(uri string) (*mongo.Client, context.Context){
 func MongoInsert(client *mongo.Client,ctx context.Context,PodResponseObject PodMetrics, NodeResponseObject NodeMetrics) bool{
 
 
-
 	col := client.Database("kubernetes-metrics").Collection("custAppMetrics2")
 
-	// Declare a MongoDB struct instance for the document's fields and data
-	//oneDoc := NodeMongo{
-	//	metrics: NodeMetricsMongo{
-	//		cpu: NodeResponseObject.Nodes[0].NodeUsages.CpuInt,
-	//		memory: NodeResponseObject.Nodes[0].NodeUsages.MemoryInt,
-	//	},
-	//	nodeMetrics: true,
-	//	nodeId: 1,
-	//	createdBy: "System",
-	//}
+	colPod := client.Database("kubernetes-metrics").Collection("PodsCollectionName")
 
-	//fmt.Println(oneDoc)
+
 	currentTime := time.Now()
-	_, insertErr := col.InsertOne(ctx,bson.D{
 
 
-		{Key: "metrics", Value:bson.D{{Key: "cpu", Value: NodeResponseObject.Nodes[0].NodeUsages.CpuInt},{Key: "memory", Value: NodeResponseObject.Nodes[0].NodeUsages.MemoryInt}}},
-		{Key: "nodeMetrics", Value: true},
-		{Key: "nodeId", Value: 1},
-		{Key: "createdBy", Value: "System"},
-		{Key: "createdDate", Value: currentTime.String()},
+	for i:=0; i<len(NodeResponseObject.Nodes);i++{
 
-	})
-	if insertErr != nil {
-		fmt.Println("InsertOne ERROR:", insertErr)
-		os.Exit(1) // safely exit script on error
-	} else {
-		fmt.Println("Added data to mongo")
+		if NodeResponseObject.Nodes[i].MetadataNodes.Name=="master"{
+
+			_, insertErr := col.InsertOne(ctx,bson.D{
+
+
+				{Key: "metrics", Value:bson.D{{Key: "cpu", Value: NodeResponseObject.Nodes[i].NodeUsages.CpuInt},{Key: "memory", Value: NodeResponseObject.Nodes[i].NodeUsages.MemoryInt}}},
+				{Key: "nodeMetrics", Value: true},
+				{Key: "nodeId", Value: 1},
+				{Key: "createdBy", Value: "System"},
+				{Key: "createdDate", Value: currentTime.String()},
+
+			})
+			if insertErr != nil {
+				fmt.Println("InsertOne ERROR:", insertErr)
+				os.Exit(1) // safely exit script on error
+			}
+		}
+		if NodeResponseObject.Nodes[i].MetadataNodes.Name=="node2"{
+			_, insertErr := col.InsertOne(ctx,bson.D{
+
+
+				{Key: "metrics", Value:bson.D{{Key: "cpu", Value: NodeResponseObject.Nodes[i].NodeUsages.CpuInt},{Key: "memory", Value: NodeResponseObject.Nodes[i].NodeUsages.MemoryInt}}},
+				{Key: "nodeMetrics", Value: true},
+				{Key: "nodeId", Value: 2},
+				{Key: "createdBy", Value: "System"},
+				{Key: "createdDate", Value: currentTime.String()},
+
+			})
+			if insertErr != nil {
+				fmt.Println("InsertOne ERROR:", insertErr)
+				os.Exit(1) // safely exit script on error
+			}
+		}
+		if NodeResponseObject.Nodes[i].MetadataNodes.Name=="node2"{
+			_, insertErr := col.InsertOne(ctx,bson.D{
+
+
+				{Key: "metrics", Value:bson.D{{Key: "cpu", Value: NodeResponseObject.Nodes[i].NodeUsages.CpuInt},{Key: "memory", Value: NodeResponseObject.Nodes[i].NodeUsages.MemoryInt}}},
+				{Key: "nodeMetrics", Value: true},
+				{Key: "nodeId", Value: 3},
+				{Key: "createdBy", Value: "System"},
+				{Key: "createdDate", Value: currentTime.String()},
+
+			})
+			if insertErr != nil {
+				fmt.Println("InsertOne ERROR:", insertErr)
+				os.Exit(1) // safely exit script on error
+			}
+		}
+
 	}
+
+
+	for i:=0; i<len(PodResponseObject.Pods);i++{
+
+
+		if PodResponseObject.Pods[i].MetadataPods.Name == "demo-app1"{
+
+			_, insertErr := colPod.InsertOne(ctx,bson.D{
+				{Key: "appId", Value:bson.D{{Key: "cpu", Value: PodResponseObject.Pods[i].Containers[i].ContainerUsages},{Key: "memory", Value: NodeResponseObject.Nodes[0].NodeUsages.MemoryInt}}},
+				{Key: "nodeMetrics", Value: true},
+				{Key: "nodeId", Value: 1},
+				{Key: "createdBy", Value: "System"},
+				{Key: "createdDate", Value: currentTime.String()},
+
+			})
+			if insertErr != nil {
+				fmt.Println("InsertOne ERROR:", insertErr)
+				os.Exit(1) // safely exit script on error
+			} else {
+				fmt.Println("Added Node data to mongo")
+			}
+
+		}
+		if PodResponseObject.Pods[i].MetadataPods.Name=="demo-app2"{
+
+
+
+
+		}
+
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	return true
 }
@@ -320,18 +404,12 @@ func MongoStore(PodResponseObject PodMetrics,NodeResponseObject NodeMetrics){
 	uri:="mongodb+srv://admin:admin123@cluster0.lnxpp.mongodb.net/kubernetes-metrics?retryWrites=true&w=majority"
 	client, ctx := MongoConnect(uri)
 
-
-
-	//testing code. remove after testing
 	databases, err := client.ListDatabaseNames(ctx, bson.M{})
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println(databases)
-
 	MongoInsert(client,ctx, PodResponseObject,NodeResponseObject)
-	//Add code to insert data to mongodb database
-	//Add for nodes and for pods/containers
 
 	defer client.Disconnect(ctx)
 
@@ -352,24 +430,6 @@ type smtpServer struct {
 	host string
 	port string
 }
-
-
-
-
-
-type NodeMongo struct {
-	metrics NodeMetricsMongo
-	nodeMetrics bool
-	nodeId int
-	createdBy string
-	createdDate primitive.DateTime
-}
-
-type  NodeMetricsMongo struct {
-	cpu int64
-	memory int64
-}
-
 
 
 
@@ -416,6 +476,8 @@ type Pod struct {
 	Timestamp string `json:"timestamp"`
 	Window string `json:"window"`
 	Containers []Container `json:"containers"`
+	Cpu int64
+	Memory int64
 }
 
 
@@ -435,12 +497,6 @@ type MetadataPod struct {
 }
 
 
-
-
-type Usage struct{
-	Cpu string `json:"cpu"`
-	Memory string `json:"memory"`
-}
 
 type ContainerUsage struct{
 	Cpu string `json:"cpu"`
