@@ -103,8 +103,6 @@ func GetIntVals(PodResponseObject PodMetrics,NodeResponseObject NodeMetrics)(Pod
 
 		}
 
-		fmt.Println("Pod:",i," cpu:",TotalPodCpu)
-		fmt.Println("Pod:",i," mem:",TotalPodMem)
 		PodResponseObject.Pods[i].Cpu=TotalPodCpu
 		PodResponseObject.Pods[i].Memory=TotalPodMem
 
@@ -151,10 +149,10 @@ func convertInt(cpuMetrics string, memoryMetrics string) (int64,int64){
 func CheckThresholdNode(NodeResponseObject NodeMetrics){
 
 	for i:=0;i<len(NodeResponseObject.Nodes);i++{
-		if NodeResponseObject.Nodes[i].NodeUsages.CpuInt > 1000{
+		if NodeResponseObject.Nodes[i].NodeUsages.CpuInt > 0{
 			MailAlert("Node",NodeResponseObject.Nodes[i].MetadataNodes.Name,"cpu",NodeResponseObject.Nodes[i].NodeUsages.CpuInt )
 
-		} else if NodeResponseObject.Nodes[i].NodeUsages.MemoryInt > 1000{
+		} else if NodeResponseObject.Nodes[i].NodeUsages.MemoryInt > 0{
 			MailAlert("Node",NodeResponseObject.Nodes[i].MetadataNodes.Name,"memory",NodeResponseObject.Nodes[i].NodeUsages.MemoryInt)
 
 		}
@@ -217,6 +215,8 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 			m4:=metric_val
 			m5:="Mi"
 			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
+			fmt.Println(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
+			fmt.Println(message)
 
 			auth := smtp.PlainAuth("", from, password, smtpServer.host)
 			err := smtp.SendMail(smtpServer.Address(), auth, from, to, message)
@@ -230,7 +230,8 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 			m4:=metric_val
 			m5:="mCores"
 			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
-
+			fmt.Println(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
+			fmt.Println(message)
 			auth := smtp.PlainAuth("", from, password, smtpServer.host)
 			err := smtp.SendMail(smtpServer.Address(), auth, from, to, message)
 			if err != nil {
@@ -248,7 +249,8 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 			m4:=metric_val/1024
 			m5:="Mi"
 			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
-
+			fmt.Println(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
+			fmt.Println(message)
 			auth := smtp.PlainAuth("", from, password, smtpServer.host)
 			err := smtp.SendMail(smtpServer.Address(), auth, from, to, message)
 			if err != nil {
@@ -262,8 +264,8 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 			m4:=metric_val
 			m5:="mCores"
 			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
-			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10))
-
+			fmt.Println(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
+			fmt.Println(message)
 			auth := smtp.PlainAuth("", from, password, smtpServer.host)
 			err := smtp.SendMail(smtpServer.Address(), auth, from, to, message)
 			if err != nil {
