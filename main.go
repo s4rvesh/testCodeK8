@@ -207,7 +207,7 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 
 
 	var message []byte
-	if item=="node"{
+	if item=="Node"{
 		if metric_type=="memory"{
 			m1:="The memory usage of Node: "
 			m2:=item_name
@@ -217,7 +217,7 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 			message=[]byte(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
 			fmt.Println(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
 			fmt.Println(message)
-
+			message=[]byte("this is working")
 			auth := smtp.PlainAuth("", from, password, smtpServer.host)
 			err := smtp.SendMail(smtpServer.Address(), auth, from, to, message)
 			if err != nil {
@@ -241,7 +241,7 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 		}
 
 
-	} else {
+	} else if item=="Pod" {
 		if metric_type=="memory"{
 			m1:="The memory usage of Pod:"
 			m2:=item_name
