@@ -28,9 +28,9 @@ func main(){
 		PodResponseObject = GetPods()
 		NodeResponseObject = GetNodes()
 		PodResponseObject, NodeResponseObject = GetIntVals(PodResponseObject,NodeResponseObject)
-		//CheckThresholdPod(PodResponseObject)
-		//CheckThresholdNode(NodeResponseObject)
-		//MongoStore(PodResponseObject, NodeResponseObject)
+		CheckThresholdPod(PodResponseObject)
+		CheckThresholdNode(NodeResponseObject)
+		MongoStore(PodResponseObject, NodeResponseObject)
 
 		time.Sleep(10 * time.Second)
 
@@ -102,8 +102,15 @@ func GetIntVals(PodResponseObject PodMetrics,NodeResponseObject NodeMetrics)(Pod
 			TotalPodMem = TotalPodMem + PodResponseObject.Pods[i].Containers[j].ContainerUsages.MemoryInt
 
 		}
+
+		fmt.Println("Pod:",i," cpu:",TotalPodCpu)
+		fmt.Println("Pod:",i," mem:",TotalPodMem)
+		PodResponseObject.Pods[i].Cpu=TotalPodCpu
+		PodResponseObject.Pods[i].Memory=TotalPodMem
+
+
 	}
-	
+
 
 
 	for i:=0;i<len(NodeResponseObject.Nodes);i++{
