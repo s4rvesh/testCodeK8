@@ -184,12 +184,6 @@ func CheckThresholdPod(PodResponseObject PodMetrics){
 
 ////////////////////////////////////////////////////////////////////
 
-
-
-func (s *smtpServer) Address() string {
-	return s.host + ":" + s.port
-}
-
 func MailAlert(item string,item_name string, metric_type string, metric_val int64){
 
 
@@ -201,28 +195,12 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 	m.SetHeader("From", "cmpe272team18@gmail.com")
 	m.SetHeader("To", "sarvesh.upadhye@gmail.com")
 
-	m.SetHeader("Subject", "Gomail test subject")
-	//from := "cmpe272team18@gmail.com"
-	//password := "Kubernetes@cmpe"
-	//
-	//
-	//
-	//// Receiver email address to be set
-	//
-	//to := []string{
-	//	"sarvesh.upadhye@gmail.com",
-	//}
-	//
-	//smtpServer := smtpServer{host: "smtp.gmail.com", port: "587"}
-	//
-	//
-	//
-	//var message []byte
+
 	if item=="Node"{
 		if metric_type=="memory"{
 			m1:="The memory usage of Node: "
 			m2:=item_name
-			m3:=" is above threshold. /n Memory Usage:"
+			m3:=" is above threshold. Memory Usage:"
 			m4:=metric_val
 			m5:="Mi"
 			subject:=item_name+"Node Memory usage Alert"
@@ -238,22 +216,12 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 			}
 
 
-
-			//
-			//fmt.Println(m1+m2+m3+strconv.FormatInt(m4, 10)+m5)
-			//fmt.Println(message)
-			//message=[]byte("this is working")
-			//auth := smtp.PlainAuth("", from, password, smtpServer.host)
-			//err := smtp.SendMail(smtpServer.Address(), auth, from, to, message)
-			//if err != nil {
-			//	fmt.Println(err)
-			//}
 		} else if metric_type=="cpu" {
 			m1:="The CPU usage of Node: "
 			m2:=item_name
-			m3:=" is above threshold. /n CPU Usage:"
+			m3:=" is above threshold. CPU Usage:"
 			m4:=metric_val
-			m5:="Mi"
+			m5:="mCores"
 			subject:=item_name+"Node CPU usage Alert"
 			m.SetHeader("Subject", subject)
 			message:=m1+m2+m3+strconv.FormatInt(m4, 10)+m5
@@ -273,7 +241,7 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 		if metric_type=="memory"{
 			m1:="The Memory usage of Pod: "
 			m2:=item_name
-			m3:=" is above threshold. /n Memory Usage:"
+			m3:=" is above threshold. Memory Usage:"
 			m4:=metric_val
 			m5:="Mi"
 			subject:=item_name+" Pod memory usage Alert"
@@ -293,7 +261,7 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 			m2:=item_name
 			m3:=" is above threshold. /n CPU Usage:"
 			m4:=metric_val
-			m5:="Mi"
+			m5:="mCores"
 			subject:=item_name+" Pod CPU usage Alert"
 			m.SetHeader("Subject", subject)
 			message:=m1+m2+m3+strconv.FormatInt(m4, 10)+m5
@@ -485,11 +453,6 @@ func MongoStore(PodResponseObject PodMetrics,NodeResponseObject NodeMetrics){
 
 
 /////////////////////////////////////////////////////////////
-type smtpServer struct {
-	host string
-	port string
-}
-
 
 
 type NodeMetrics struct{
