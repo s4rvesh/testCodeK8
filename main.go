@@ -292,7 +292,7 @@ func MongoInsert(client *mongo.Client,ctx context.Context,PodResponseObject PodM
 
 	col := client.Database("kubernetes-metrics").Collection("custAppMetrics2")
 
-	colPod := client.Database("kubernetes-metrics").Collection("PodsCollectionName")
+	colPod := client.Database("kubernetes-metrics").Collection("custAppMetrics2")
 
 
 	currentTime := time.Now()
