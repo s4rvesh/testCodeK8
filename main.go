@@ -24,7 +24,7 @@ func main(){
 	var PodResponseObject PodMetrics
 	var NodeResponseObject NodeMetrics
 
-	for i:=0;i<80;i++{
+	for i:=0;i<200;i++{
 
 		PodResponseObject = GetPods()
 		NodeResponseObject = GetNodes()
@@ -150,10 +150,10 @@ func convertInt(cpuMetrics string, memoryMetrics string) (int64,int64){
 func CheckThresholdNode(NodeResponseObject NodeMetrics){
 
 	for i:=0;i<len(NodeResponseObject.Nodes);i++{
-		if NodeResponseObject.Nodes[i].NodeUsages.CpuInt > 0{
+		if NodeResponseObject.Nodes[i].NodeUsages.CpuInt > 1000{
 			MailAlert("Node",NodeResponseObject.Nodes[i].MetadataNodes.Name,"cpu",NodeResponseObject.Nodes[i].NodeUsages.CpuInt )
 
-		} else if NodeResponseObject.Nodes[i].NodeUsages.MemoryInt > 0{
+		} else if NodeResponseObject.Nodes[i].NodeUsages.MemoryInt > 2700{
 			MailAlert("Node",NodeResponseObject.Nodes[i].MetadataNodes.Name,"memory",NodeResponseObject.Nodes[i].NodeUsages.MemoryInt)
 
 		}
@@ -167,11 +167,11 @@ func CheckThresholdPod(PodResponseObject PodMetrics){
 
 	for i:=0;i<len(PodResponseObject.Pods);i++{
 
-				if PodResponseObject.Pods[i].Cpu > 1000000000{
+				if PodResponseObject.Pods[i].Cpu > 200{
 
 					MailAlert("Pod",PodResponseObject.Pods[i].MetadataPods.Name,"cpu",PodResponseObject.Pods[i].Cpu)
 
-				} else if PodResponseObject.Pods[i].Memory> 1000000000 {
+				} else if PodResponseObject.Pods[i].Memory> 200 {
 
 					MailAlert("Pod",PodResponseObject.Pods[i].MetadataPods.Name,"memory",PodResponseObject.Pods[i].Memory)
 
