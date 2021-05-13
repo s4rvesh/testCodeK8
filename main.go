@@ -193,7 +193,7 @@ func MailAlert(item string,item_name string, metric_type string, metric_val int6
 
 
 	m.SetHeader("From", "cmpe272team18@gmail.com")
-	m.SetHeader("To", "sarvesh.upadhye@gmail.com")
+	m.SetHeader("To", "bharathjagini@gmail.com")
 
 
 	if item=="Node"{
